@@ -10,9 +10,9 @@
 
     </head>
     <body>
-        <v-app id="app">
-            <example-component></example-component>
-        </v-app>
+        <div id="app">
+            <app-component></app-component>
+        </div>
 
         <script src="{{ asset('js/app.js') }}"></script>
     </body>
