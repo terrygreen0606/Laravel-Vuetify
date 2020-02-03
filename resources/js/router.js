@@ -2,26 +2,39 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Login from "./components/Login.vue";
 import Admin from "./components/Admin.vue";
-import Playlist from "./components/Playlist.vue";
+import Roles from "./components/Roles.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
     { path: "/", redirect: "/login" },
     { path: "/login", component: Login, name: "Login" },
-    { path: "/admin", component: Admin, name: "Admin" },
     {
-        path: "/playlist",
-        component: Playlist,
-        name: "Playlist",
+        path: "/admin",
+        component: Admin,
+        name: "Admin",
+        children: [{ path: "roles", component: Roles, name: "Roles" }],
         beforeEnter: (to, from, next) => {
-            if (localStorage.getItem("token")) {
-                next();
-            } else {
-                next("/login");
-            }
+            axios
+                .get("api/verify")
+                .then(res => {
+                    next();
+                })
+                .catch(() => next("/login"));
         }
     }
 ];
 
-export default new VueRouter({ routes });
+const router = new VueRouter({
+    routes
+});
+
+// Global protected routes
+router.beforeEach((to, from, next) => {
+    const token = localStorage.getItem("token") || null;
+    // Promise of Authorization Bearer
+    window.axios.defaults.headers["Authorization"] = "Bearer " + token;
+    next();
+});
+
+export default router;
